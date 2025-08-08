@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Types Explorer</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* emerald-50 */
+            color: #1f2937; /* gray-800 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 900px;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 10px -4px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+        .stage {
+            display: none;
+        }
+        .stage.active {
+            display: block;
+        }
+        .game-button {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 9999px;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+            background-color: #10b981; /* emerald-500 */
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        .drag-item {
+            cursor: grab;
+            padding: 0.5rem 1rem;
+            background-color: #f1f5f9;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            margin: 0.25rem;
+            text-align: center;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .drag-item:active { cursor: grabbing; transform: scale(1.05); }
+        .drop-zone {
+            min-height: 100px;
+            border: 2px dashed #94a3b8;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .drop-zone.active { border-color: #10b981; background-color: #ecfdf5; }
+        .drop-zone-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .drop-zone-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .quiz-item {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            background-color: #f1f5f9;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+        .quiz-item.correct { background-color: #dcfce7; border-color: #22c55e; }
+        .quiz-item.incorrect { background-color: #fee2e2; border-color: #ef4444; }
+        .quiz-item:not(.correct):not(.incorrect):hover { background-color: #e2e8f0; }
+        #modal-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+        }
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Stage 0: Main Menu / Dashboard -->
+    <div id="stage-menu" class="stage active">
+        <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">Data Types Explorer</h1>
+        <p class="text-center text-lg mb-8 text-slate-600">Explore the fundamentals of data types, including their characteristics, uses, and limitations. Choose a module to begin.</p>
+        <div class="grid md:grid-cols-3 gap-6 text-center">
+            <button class="game-button flex-1" onclick="changeStage('stage-intro')">
+                <span class="text-2xl mb-2">📚</span><br>
+                1. Data Types Overview
+            </button>
+            <button class="game-button flex-1" onclick="changeStage('stage-sort')">
+                <span class="text-2xl mb-2">📋</span><br>
+                2. Sorting Challenge
+            </button>
+            <button class="game-button flex-1" onclick="changeStage('stage-quiz')">
+                <span class="text-2xl mb-2">❓</span><br>
+                3. Knowledge Quiz
+            </button>
+        </div>
+    </div>
+
+    <!-- Stage 1: Introduction to Data Types -->
+    <div id="stage-intro" class="stage">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-center">1. Data Types Overview</h1>
+        <div class="prose text-lg text-slate-700 mb-6">
+            <p>A **data type** is a classification of data which tells a computer how the data should be interpreted and what operations can be performed on it.</p>
+            <h3 class="font-bold text-xl mt-4">Boolean</h3>
+            <ul class="list-disc list-inside">
+                <li>Stores a value of either `True` or `False`.</li>
+                <li>**Use:** Representing logical conditions, such as the result of a comparison.</li>
+            </ul>
+            <h3 class="font-bold text-xl mt-4">Character</h3>
+            <ul class="list-disc list-inside">
+                <li>Stores a single character, like a letter, number, or symbol.</li>
+                <li>**Use:** Storing single keystrokes or as part of a string.</li>
+            </ul>
+            <h3 class="font-bold text-xl mt-4">Date</h3>
+            <ul class="list-disc list-inside">
+                <li>Stores date and/or time information.</li>
+                <li>**Use:** Tracking events, calculating durations, or scheduling.</li>
+            </ul>
+            <h3 class="font-bold text-xl mt-4">Integer</h3>
+            <ul class="list-disc list-inside">
+                <li>Stores whole numbers (e.g., 5, -100).</li>
+                <li>**Use:** Counting items, storing scores, or representing quantities that can't be fractional.</li>
+            </ul>
+            <h3 class="font-bold text-xl mt-4">Real / Float</h3>
+            <ul class="list-disc list-inside">
+                <li>Stores numbers with a decimal or fractional part (e.g., 3.14, 9.81).</li>
+                <li>**Use:** Scientific measurements, currency, or any value that needs high precision.</li>
+            </ul>
+            <h3 class="font-bold text-xl mt-4">String</h3>
+            <ul class="list-disc list-inside">
+                <li>Stores a sequence of characters, also known as text.</li>
+                <li>**Use:** Names, addresses, sentences, or any data that is textual.</li>
+            </ul>
+        </div>
+        <div class="text-center mt-8">
+            <button class="game-button" onclick="changeStage('stage-menu')">Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Stage 2: Sorting Challenge -->
+    <div id="stage-sort" class="stage">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-center">2. Sorting Challenge</h1>
+        <p class="text-center text-lg mb-6 text-slate-600">Drag each data value into its correct data type category.</p>
+        
+        <div id="values-to-sort" class="flex flex-wrap justify-center mb-6">
+            <!-- Data values will be dynamically inserted here -->
+        </div>
+
+        <div class="drop-zone-grid grid-cols-2 md:grid-cols-3">
+            <div id="drop-boolean" class="drop-zone border-rose-400" data-type="boolean">
+                <h3 class="font-bold text-lg text-center text-rose-600">Boolean</h3>
+            </div>
+            <div id="drop-character" class="drop-zone border-amber-400" data-type="character">
+                <h3 class="font-bold text-lg text-center text-amber-600">Character</h3>
+            </div>
+            <div id="drop-date" class="drop-zone border-sky-400" data-type="date">
+                <h3 class="font-bold text-lg text-center text-sky-600">Date</h3>
+            </div>
+            <div id="drop-integer" class="drop-zone border-blue-400" data-type="integer">
+                <h3 class="font-bold text-lg text-center text-blue-600">Integer</h3>
+            </div>
+            <div id="drop-real" class="drop-zone border-green-400" data-type="real">
+                <h3 class="font-bold text-lg text-center text-green-600">Real / Float</h3>
+            </div>
+            <div id="drop-string" class="drop-zone border-indigo-400" data-type="string">
+                <h3 class="font-bold text-lg text-center text-indigo-600">String</h3>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <button id="check-sort-button" class="game-button" onclick="checkSort()">Check Answers</button>
+            <button id="sort-menu-button" class="game-button hidden" onclick="changeStage('stage-menu')">Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Stage 3: Knowledge Quiz -->
+    <div id="stage-quiz" class="stage">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-center">3. Knowledge Quiz</h1>
+        <div id="quiz-question-container" class="prose text-lg text-slate-700 mb-6">
+            <!-- Quiz questions will be dynamically inserted here -->
+        </div>
+        <div class="text-center mt-8">
+            <button id="quiz-next-button" class="game-button" onclick="nextQuizQuestion()">Next Question</button>
+            <button id="quiz-menu-button" class="game-button hidden" onclick="changeStage('stage-menu')">Back to Menu</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-overlay" class="hidden"></div>
+<div id="modal-message" class="hidden">
+    <h2 class="text-2xl font-bold mb-4"></h2>
+    <p class="mb-4"></p>
+    <button class="game-button" onclick="closeModal()">Close</button>
+</div>
+
+<script>
+    // --- State Management ---
+    let currentStage = 'stage-menu';
+    let sortState = {
+        values: [],
+        answered: false
+    };
+    let quizState = {
+        questions: [],
+        currentQuestionIndex: 0,
+        score: 0,
+        answered: false
+    };
+
+    // --- DOM Elements ---
+    const stages = document.querySelectorAll('.stage');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalMessage = document.getElementById('modal-message');
+
+    // --- Data for Modules ---
+    const sortData = [
+        { value: 'True', type: 'boolean' },
+        { value: '100', type: 'integer' },
+        { value: '3.14', type: 'real' },
+        { value: `'A'`, type: 'character' },
+        { value: `'Hello World'`, type: 'string' },
+        { value: '19/08/2025', type: 'date' },
+        { value: 'False', type: 'boolean' },
+        { value: '-50', type: 'integer' },
+        { value: '99.9', type: 'real' },
+        { value: `'?'`, type: 'character' },
+        { value: `'Gemini'`, type: 'string' },
+        { value: '12:30 PM', type: 'date' }
+    ];
+
+    const quizData = [
+        {
+            question: 'Which data type is most appropriate for storing a person\'s age?',
+            options: ['String', 'Real', 'Integer'],
+            answer: 'Integer',
+            explanation: 'Age is typically a whole number, so an Integer is the most efficient and precise data type to use.'
+        },
+        {
+            question: 'What is a limitation of the String data type?',
+            options: ['It cannot contain numbers.', 'Mathematical operations cannot be performed on it directly.', 'It can only store one word.'],
+            answer: 'Mathematical operations cannot be performed on it directly.',
+            explanation: 'Even if a string contains numbers, like "50", a program cannot perform math on it unless it is first converted to a numeric type.'
+        },
+        {
+            question: 'Which data type would you use for a `Yes/No` field in a database?',
+            options: ['String', 'Boolean', 'Character'],
+            answer: 'Boolean',
+            explanation: 'The Boolean data type is specifically designed to store values that can only be one of two states, such as `True` or `False`, `Yes` or `No`.'
+        },
+        {
+            question: 'Which data type is best for storing a person\'s full name and address?',
+            options: ['Integer', 'String', 'Character'],
+            answer: 'String',
+            explanation: 'Names and addresses are sequences of multiple characters, which is the definition of a String.'
+        },
+        {
+            question: 'What is a key benefit of the Character data type?',
+            options: ['It stores multiple characters.', 'It is highly memory-efficient for storing single symbols.', 'It is the most common data type for math.'],
+            answer: 'It is highly memory-efficient for storing single symbols.',
+            explanation: 'A Character uses less memory than a String to store just one single character.'
+        }
+    ];
+
+    // --- General Functions ---
+    function changeStage(stageId) {
+        currentStage = stageId;
+        stages.forEach(stage => {
+            stage.classList.toggle('active', stage.id === stageId);
+        });
+
+        if (stageId === 'stage-sort') {
+            initSort();
+        } else if (stageId === 'stage-quiz') {
+            initQuiz();
+        }
+    }
+
+    function showModal(title, message, isError = false) {
+        modalOverlay.classList.remove('hidden');
+        modalMessage.classList.remove('hidden');
+        modalMessage.querySelector('h2').textContent = title;
+        modalMessage.querySelector('p').textContent = message;
+        if (isError) {
+            modalMessage.querySelector('h2').style.color = '#ef4444';
+        } else {
+            modalMessage.querySelector('h2').style.color = '#10b981';
+        }
+    }
+
+    function closeModal() {
+        modalOverlay.classList.add('hidden');
+        modalMessage.classList.add('hidden');
+    }
+    
+    // --- Stage 2: Sorting Logic (Drag and Drop) ---
+    let draggedItem = null;
+
+    function initSort() {
+        const container = document.getElementById('values-to-sort');
+        container.innerHTML = '';
+        sortState.answered = false;
+
+        // Shuffle the data values
+        sortState.values = [...sortData].sort(() => 0.5 - Math.random());
+        sortState.values.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'drag-item p-4 text-xl font-bold w-24 border-2 border-slate-300';
+            itemElement.textContent = item.value;
+            itemElement.draggable = true;
+            itemElement.dataset.type = item.type;
+            itemElement.addEventListener('dragstart', (e) => {
+                draggedItem = itemElement;
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            container.appendChild(itemElement);
+        });
+
+        const dropZones = document.querySelectorAll('.drop-zone');
+        dropZones.forEach(zone => {
+            zone.innerHTML = `<h3 class="font-bold text-lg text-center text-${zone.dataset.type}-600">${zone.querySelector('h3').textContent}</h3>`;
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('active');
+            });
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('active');
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('active');
+                if (draggedItem && draggedItem.dataset.type === zone.dataset.type) {
+                    zone.appendChild(draggedItem);
+                }
+            });
+        });
+
+        document.getElementById('check-sort-button').classList.remove('hidden');
+        document.getElementById('sort-menu-button').classList.add('hidden');
+    }
+
+    function checkSort() {
+        if (document.getElementById('values-to-sort').children.length > 0) {
+            showModal('Not Finished!', 'Please sort all the values into a category before checking your answers.', true);
+            return;
+        }
+
+        let correctCount = 0;
+        const dropZones = document.querySelectorAll('.drop-zone');
+        dropZones.forEach(zone => {
+            const items = zone.querySelectorAll('.drag-item');
+            items.forEach(item => {
+                if (item.dataset.type === zone.dataset.type) {
+                    item.classList.add('bg-green-200', 'border-green-500');
+                    correctCount++;
+                } else {
+                    item.classList.add('bg-red-200', 'border-red-500');
+                }
+            });
+        });
+
+        showModal('Challenge Complete!', `You got ${correctCount} out of ${sortData.length} correct!`);
+        document.getElementById('check-sort-button').classList.add('hidden');
+        document.getElementById('sort-menu-button').classList.remove('hidden');
+    }
+
+    // --- Stage 3: Quiz Logic ---
+    function initQuiz() {
+        quizState.questions = [...quizData].sort(() => 0.5 - Math.random());
+        quizState.currentQuestionIndex = 0;
+        quizState.score = 0;
+        document.getElementById('quiz-next-button').textContent = 'Next Question';
+        document.getElementById('quiz-next-button').classList.remove('hidden');
+        document.getElementById('quiz-menu-button').classList.add('hidden');
+        displayQuizQuestion();
+    }
+
+    function displayQuizQuestion() {
+        const container = document.getElementById('quiz-question-container');
+        container.innerHTML = '';
+        quizState.answered = false;
+
+        if (quizState.currentQuestionIndex >= quizState.questions.length) {
+            const finalScoreMessage = document.createElement('div');
+            finalScoreMessage.innerHTML = `<h3 class="text-2xl font-bold mb-2">Quiz Finished!</h3><p>You scored ${quizState.score} out of ${quizState.questions.length}.</p>`;
+            container.appendChild(finalScoreMessage);
+            document.getElementById('quiz-next-button').classList.add('hidden');
+            document.getElementById('quiz-menu-button').classList.remove('hidden');
+            return;
+        }
+
+        const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
+        const questionHtml = document.createElement('div');
+        questionHtml.innerHTML = `<h3 class="font-bold text-xl mb-4">${currentQuestion.question}</h3>`;
+        container.appendChild(questionHtml);
+
+        const shuffledOptions = [...currentQuestion.options].sort(() => 0.5 - Math.random());
+        shuffledOptions.forEach(option => {
+            const optionElement = document.createElement('div');
+            optionElement.className = 'quiz-item';
+            optionElement.textContent = option;
+            optionElement.onclick = () => selectQuizAnswer(option, currentQuestion.answer, optionElement, currentQuestion.explanation);
+            container.appendChild(optionElement);
+        });
+    }
+
+    function selectQuizAnswer(selected, correct, element, explanation) {
+        if (quizState.answered) return;
+        quizState.answered = true;
+        
+        if (selected === correct) {
+            element.classList.add('correct');
+            quizState.score++;
+        } else {
+            element.classList.add('incorrect');
+            const correctElement = document.querySelector(`.quiz-item[onclick*="${correct}"]`);
+            correctElement.classList.add('correct');
+        }
+
+        const allOptions = document.querySelectorAll('#quiz-question-container .quiz-item');
+        allOptions.forEach(item => item.style.cursor = 'default');
+        
+        showModal('Result', selected === correct ? `Correct! ${explanation}` : `Incorrect. The correct answer is "${correct}". ${explanation}`);
+    }
+
+    function nextQuizQuestion() {
+        if (!quizState.answered) {
+            showModal('Hold On!', 'Please select an answer before moving to the next question.', true);
+            return;
+        }
+        quizState.currentQuestionIndex++;
+        displayQuizQuestion();
+    }
+
+    // --- Initial Load ---
+    window.onload = function() {
+        // Any initial setup can go here, though the menu is the default stage.
+    };
+</script>
+</body>
+</html>
